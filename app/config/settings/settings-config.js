@@ -17,8 +17,12 @@ function createArgumentSettings(settings) {
     settings.clusterEnabled = commandLineArgs[2] ? parseInt(commandLineArgs[2]) : 0;
     settings.environment = commandLineArgs[3] ? commandLineArgs[3].toLowerCase() : 'prod';
     settings.hostName = commandLineArgs[4] ? commandLineArgs[4] : '127.0.0.1';
-    settings.masterPort = commandLineArgs[5] ? parseInt(commandLineArgs[5]) : process.env.PORT;
-    settings.workerPort = commandLineArgs[6] ? parseInt(commandLineArgs[6]) : 9000;
+    if (process.env.PORT) {
+        settings.workerPort = process.env.PORT;
+    } else {
+        settings.workerPort = commandLineArgs[6] ? parseInt(commandLineArgs[6]) : 9000;
+    }
+    settings.masterPort = commandLineArgs[5] ? parseInt(commandLineArgs[5]) : 3000;
 }
 
 function loadConfigSettings(settings) {
