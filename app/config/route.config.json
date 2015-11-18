@@ -1,0 +1,7 @@
+{
+    "routes": [{
+        "route": "/v1/contact",
+        "method": "POST",
+        "controller": "../controllers/v1/contact/contact-controller"
+    }]
+}
