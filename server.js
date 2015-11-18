@@ -13,7 +13,7 @@ if (settingsConfig.settings.clusterEnabled === 1) {
         workers: './app/config/worker-config.js',
         accessKey: settingsConfig.settings.clusterAccessKey,
         host: settingsConfig.settings.hostName,
-        port: process.env.PORT || settingsConfig.settings.masterPort
+        port: settingsConfig.settings.masterPort
     });
 } else {
     require('./app/config/worker-config.js');
