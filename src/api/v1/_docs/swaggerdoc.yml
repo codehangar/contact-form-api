@@ -1,0 +1,229 @@
+swagger: '2.0'
+tags: []
+host: 'localhost:8080'
+basePath: '/api/v1'
+info:
+  title: CodeHangar Base API Docs
+  description: Api docs for our internal base api repo
+  version: '1.0'
+  base: 'test'
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  Auth:
+    name: Request
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+  UserPost:
+    name: Request
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+  UserPut:
+    name: Request
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+      properties:
+        email:
+          type: string
+  SendResetPassword:
+    name: Request
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+      properties:
+        email:
+          type: string
+  ResetPassword:
+    name: Request
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        resetPasswordToken:
+          type: string
+  ConfirmEmail:
+    name: Request
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+      properties:
+        email:
+          type: string
+        confirmEmailToken:
+          type: string
+  UserId:
+      name: userId
+      description: 'The users id'
+      in: path
+      required: true
+      type: string
+  XAccessToken:
+    name: x-access-token
+    in: header
+    description: 'Authorization Token'
+    required: true
+    type: string
+responses:
+  GeneralError:
+    description: 'Error'
+    schema:
+      type: object
+      properties:
+        errorType:
+          type: string
+          description: 'A string constant representing the error'
+        errorMessage:
+          type: string
+          description: 'A human readable version of the error'
+        errorDetail:
+          type: string
+          description: 'System level error detail'
+paths:
+  '/user':
+    post:
+      summary: 'Create a user'
+      description: 'Create a user for the application'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - $ref: '#/parameters/UserPost'
+      responses:
+        '201':
+          description: 'Success'
+  '/user/{userId}':
+    put:
+      summary: 'Update a user'
+      description: 'Update a user for the application'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - $ref: '#/parameters/UserPut'
+        - $ref: '#/parameters/UserId'
+        - $ref: '#/parameters/XAccessToken'
+      responses:
+        '200':
+          description: 'Success'
+  '/user/send/confirm/email':
+    post:
+      summary: 'Send an email to confirm email'
+      description: 'Endpoint for the client to intiate a confirm email for a user that might not have recieved the automated one'
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - $ref: '#/parameters/XAccessToken'
+      responses:
+        '200':
+          description: 'Success'
+  '/user/confirm/email':
+    post:
+      summary: 'Confirm a users email'
+      description: 'Confirm a users email with a confirmEmailToken'
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - $ref: '#/parameters/ConfirmEmail'
+        - $ref: '#/parameters/XAccessToken'
+      responses:
+        '200':
+          description: 'Success'
+  '/user/send/reset/password':
+    post:
+      summary: 'Send an email to reset password'
+      description: 'Unauthorized route that gives users a workflow to reset their password'
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - $ref: '#/parameters/SendResetPassword'
+      responses:
+        '200':
+          description: 'Success'
+  '/user/reset/password':
+    post:
+      summary: 'Reset a users password'
+      description: 'Reset a users password with the resetPasswordToken'
+      consumes:
+        - application/json
+      tags:
+        - user
+      parameters:
+        - $ref: '#/parameters/ResetPassword'
+      responses:
+        '200':
+          description: 'Success'
+  '/auth/login':
+    post:
+      summary: 'Authorize a user'
+      description: 'Gain authorization token and user object'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - auth
+      parameters:
+        - $ref: '#/parameters/Auth'
+      responses:
+        '200':
+          description: 'Success'
+  '/auth/logout':
+    post:
+      summary: 'Logout and close a session for a user'
+      description: 'Deletes the session of a user and invalidate access token'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - auth
+      parameters:
+        - $ref: '#/parameters/XAccessToken'
+      responses:
+        '200':
+          description: 'Success'

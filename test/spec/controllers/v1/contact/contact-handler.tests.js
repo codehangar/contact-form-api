@@ -1,6 +1,6 @@
-describe('ContactController Tests', function() {
+describe('ContactHandler Tests', function() {
 
-    var contactController;
+    var contactHandler;
     var req;
     var res;
     var next;
@@ -42,39 +42,39 @@ describe('ContactController Tests', function() {
 
         sinon.spy(res, "status");
 
-        contactController = require('../../../../../app/controllers/v1/contact/contact-controller');
+        contactHandler = require('../../../../../src/api/v1/contact/contact.handler');
     });
 
-    describe('post()', function() {
+    describe('contactHandler()', function() {
 
         it('should be a function', function(done) {
-            expect(contactController.post).to.be.a('function');
+            expect(contactHandler).to.be.a('function');
             done();
         });
 
         it('should call Slack.newContact() one time', function(done) {
-            contactController.post(req, res, next);
+            contactHandler(req, res, next);
 
             expect(Slack.newContact.callCount).to.equal(1);
             done();
         });
 
         it('should call Slack.newContact() with req.body', function(done) {
-            contactController.post(req, res, next);
+            contactHandler(req, res, next);
 
             expect(Slack.newContact.calledWith(req.body)).to.equal(true);
             done();
         });
 
         it('should call res.status() one time', function(done) {
-            contactController.post(req, res, next);
+            contactHandler(req, res, next);
 
             expect(res.status.callCount).to.equal(1);
             done();
         });
 
         it('should call res.status() with 200', function(done) {
-            contactController.post(req, res, next);
+            contactHandler(req, res, next);
 
             expect(res.status.calledWith(200)).to.equal(true);
             done();

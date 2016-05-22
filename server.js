@@ -10,8 +10,7 @@ var http = require('http');
 var express = require('express');
 var application = express();
 var bodyParser = require('body-parser');
-var routeConfig = require('./app/config/route-config');
-var settingsConfig = require('./app/config/settings/settings-config');
+var corsMiddleware = require('./src/middleware/cors.middleware.js');
 
 function configureWorker(application) {
     configureApplication(application);
@@ -20,11 +19,13 @@ function configureWorker(application) {
     startServer(application);
 }
 
+/** General App Middleware **/
 function configureApplication(application) {
     application.use(bodyParser.json());
     application.use(bodyParser.urlencoded({
         extended: true
     }));
+    application.use(corsMiddleware);
 
     application.use(function(req, res, next) {
         res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -35,15 +36,17 @@ function configureApplication(application) {
     });
 }
 
+/** Register API Middleware **/
 function configureRoutes(application) {
-    routeConfig.registerRoutes(application);
+    /** Version 1 **/
+    application.use('/api/v1/docs', express.static('./src/api/v1/_docs'));
+    application.use('/api/v1', require('./src/api/v1/routes.js'));
 }
 
 function startServer(application) {
-    var server = http.createServer(application);
-
-    server.listen(settingsConfig.settings.workerPort, function() {
-        console.log('listening at http://%s:%s', settingsConfig.settings.hostName, settingsConfig.settings.workerPort);
+    var port = process.env.PORT || 9000;
+    var server = application.listen(port, function() {
+        console.log('listening on port: %s', port);
     });
 }
 

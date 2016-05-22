@@ -3,7 +3,7 @@ describe('SlackService Tests', function() {
     var slackService;
 
     beforeEach(function() {
-        slackService = require('../../../../app/services/slack/slack-service');
+        slackService = require('../../../../src/services/slack/slack-service');
     });
 
     describe('newContact', function() {

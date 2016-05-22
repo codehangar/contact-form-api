@@ -18,7 +18,7 @@ describe('EmailService Tests', function() {
         // replace the require() module `postmark` with a stub object
         mockery.registerMock('postmark', postmark);
 
-        emailService = require('../../../../app/services/email/email-service');
+        emailService = require('../../../../src/services/email/email-service');
     });
 
     describe('newContact', function() {
