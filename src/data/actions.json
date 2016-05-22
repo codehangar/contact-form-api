@@ -1,0 +1,37 @@
+{
+    "codehangar-contact-form": {
+        "type": "contact",
+        "domain": "codehangar.io",
+        "postmark": {
+            "from": "info@codehangar.io",
+            "to": "info@codehangar.io",
+            "cc": null,
+            "bcc": null,
+            "templateId": "216061"
+        },
+        "slack": {
+            "username": "Code Hangar Contact",
+            "channel": "#contact-form",
+            "icon_emoji": ":mailbox_with_mail:"
+        }
+    },
+    "reqlpro": {
+        "type": "download",
+        "domain": "utils.codehangar.io/rethink",
+        "postmark": {
+            "from": "reqlpro@codehangar.io",
+            "to": null,
+            "cc": null,
+            "bcc": "reqlpro@codehangar.io",
+            "templateId": "652061",
+            "templateModel": {
+              "action_url": "https://s3.amazonaws.com/reqlpro/ReQLPro_0.0.1.dmg"
+            }
+        },
+        "slack": {
+            "username": "ReQLPro Signups",
+            "channel": "#integrations",
+            "icon_emoji": ":rain_cloud:"
+        }
+    }
+}
