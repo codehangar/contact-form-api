@@ -28,6 +28,7 @@
     "sinon": "^1.17.2"
   },
   "dependencies": {
+    "analytics-node": "^2.1.0",
     "body-parser": "^1.14.1",
     "cluster-service": "^1.0.6",
     "dotenv": "^1.2.0",
