@@ -25,7 +25,7 @@
             "bcc": "reqlpro@codehangar.io",
             "templateId": "652061",
             "templateModel": {
-              "action_url": "https://s3.amazonaws.com/reqlpro/ReQLPro_0.0.1.dmg"
+              "action_url": "https://s3.amazonaws.com/reqlpro/ReQLPro_0.0.2.dmg"
             }
         },
         "slack": {
