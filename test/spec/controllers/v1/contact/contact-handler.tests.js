@@ -1,13 +1,14 @@
-describe('ContactHandler Tests', function() {
+const actions = require('../../../../../src/data/actions.json');
+const slackAction = actions['codehangar-contact-form'];
 
-    var contactHandler;
-    var req;
-    var res;
-    var next;
-    var Slack;
-    var Email;
+describe('ContactHandler Tests', () => {
+    let contactHandler;
+    let req;
+    let res;
+    let Slack;
+    let Email;
 
-    beforeEach(function() {
+    beforeEach(() => {
         mockery.enable({
             warnOnReplace: false,
             warnOnUnregistered: false,
@@ -19,70 +20,63 @@ describe('ContactHandler Tests', function() {
         Slack.newContact = sinon.stub();
 
         // replace the require() module `Slack` with a stub object
-        mockery.registerMock('../../../services/slack/slack-service.js', Slack);
+        mockery.registerMock('../../../services/slack.service', Slack);
 
         // Mock the Email service
         Email = sinon.stub();
         Email.newContact = sinon.stub();
 
         // replace the require() module `Email` with a stub object
-        mockery.registerMock('../../../services/email/email-service.js', Email);
+        mockery.registerMock('../../../services/email.service', Email);
 
         // mock the req and res objects
         req = {
-            body: 'test'
+            body: 'test',
+            header: sinon.stub().returns('tester'),
+            params: {
+                id: 'codehangar-contact-form'
+            },
+            connection: {remoteAddress: ''}
         };
         res = {
-            status: function(code) {
-                return {
-                    send: function(obj) {}
+            status: () => ({
+                send: () => {
                 }
-            }
+            })
         };
 
-        sinon.spy(res, "status");
+        sinon.spy(res, 'status');
 
         contactHandler = require('../../../../../src/api/v1/contact/contact.handler');
     });
 
-    describe('contactHandler()', function() {
-
-        it('should be a function', function(done) {
+    describe('contactHandler()', () => {
+        it('should be a function', () => {
             expect(contactHandler).to.be.a('function');
-            done();
         });
 
-        it('should call Slack.newContact() one time', function(done) {
-            contactHandler(req, res, next);
-
+        it('should call Slack.newContact() one time', () => {
+            contactHandler(req, res);
             expect(Slack.newContact.callCount).to.equal(1);
-            done();
         });
 
-        it('should call Slack.newContact() with req.body', function(done) {
-            contactHandler(req, res, next);
-
-            expect(Slack.newContact.calledWith(req.body)).to.equal(true);
-            done();
+        it('should call Slack.newContact() with req.body', () => {
+            contactHandler(req, res);
+            expect(Slack.newContact.calledWith(slackAction, 'test')).to.equal(true);
         });
 
-        it('should call res.status() one time', function(done) {
-            contactHandler(req, res, next);
-
+        it('should call res.status() one time', () => {
+            contactHandler(req, res);
             expect(res.status.callCount).to.equal(1);
-            done();
         });
 
-        it('should call res.status() with 200', function(done) {
-            contactHandler(req, res, next);
-
+        it('should call res.status() with 200', () => {
+            contactHandler(req, res);
             expect(res.status.calledWith(200)).to.equal(true);
-            done();
         });
-
     });
 
-    after(function() {
+    after(() => {
         mockery.disable();
     });
 });

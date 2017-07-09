@@ -1,13 +1,14 @@
 /**
  * Enable CORS Middleware
- * @param {Object} Express Request Object
- * @param {Object} Express Response Object
+ * @param {Object} req - Express Request Object
+ * @param {Object} res - Express Response Object
+ * @param {Function} next - Express Response Object
  */
-var CORSMiddleware = function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Authorization, x-access-token, Accept, *");
-  next();
+const CORSMiddleware = (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Authorization, x-access-token, Accept, *');
+    next();
 };
 
 module.exports = CORSMiddleware;

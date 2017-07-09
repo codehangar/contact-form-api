@@ -1,53 +1,52 @@
-try {
+console.log('process.env.NODE_ENV', process.env.NODE_ENV); // eslint-disable-line no-console
+if (process.env.NODE_ENV === 'development') { // eslint-disable-line no-undef
     // Loads environment settings from '.env' into process.env
     // This is for local development
-    require('dotenv').load();
-} catch (e) {
-    console.log('.env file not found')
+    require('dotenv').config();
 }
 
-var http = require('http');
-var express = require('express');
-var application = express();
-var bodyParser = require('body-parser');
-var corsMiddleware = require('./src/middleware/cors.middleware.js');
-
-function configureWorker(application) {
-    configureApplication(application);
-    configureRoutes(application);
-
-    startServer(application);
-}
+const express = require('express');
+const application = express();
+const bodyParser = require('body-parser');
+const CORSMiddleware = require('./src/middleware/cors.middleware.js');
 
 /** General App Middleware **/
-function configureApplication(application) {
-    application.use(bodyParser.json());
-    application.use(bodyParser.urlencoded({
+function configureApplication(app) {
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({
         extended: true
     }));
-    application.use(corsMiddleware);
+    app.use(CORSMiddleware);
 
-    application.use(function(req, res, next) {
+    app.use((req, res, next) => {
         res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.set('Pragma', 'no-cache');
         res.set('Expires', '0');
-        res.type('application/json');
+        // res.type('application/json');
         next();
     });
 }
 
 /** Register API Middleware **/
-function configureRoutes(application) {
+function configureRoutes(app) {
     /** Version 1 **/
-    application.use('/api/v1/docs', express.static('./src/api/v1/_docs'));
-    application.use('/api/v1', require('./src/api/v1/routes.js'));
+    app.use('/api/v1', require('./src/api/v1/routes.js'));
+    if (process.env.NODE_ENV === 'development') {
+        app.use('/api/v1/docs', express.static(__dirname + '/src/api/v1/_docs'));
+    }
 }
 
-function startServer(application) {
-    var port = process.env.PORT || 9000;
-    var server = application.listen(port, function() {
-        console.log('listening on port: %s', port);
+function startServer(app) {
+    const port = process.env.PORT || 9000;
+    app.listen(port, () => {
+        console.log('listening on port: %s', port); // eslint-disable-line no-console
     });
+}
+
+function configureWorker(app) {
+    configureApplication(app);
+    configureRoutes(app);
+    startServer(app);
 }
 
 configureWorker(application);

@@ -1,44 +1,58 @@
-var Slack = require('../../../services/slack/slack.service.js');
-var Email = require('../../../services/email/email.service.js');
-var Segment = require('../../../services/segment/segment.service.js');
-var actions = require('../../../data/actions.json');
+const Slack = require('../../../services/slack.service');
+const Email = require('../../../services/email.service');
+const Segment = require('../../../services/segment.service');
+const Captcha = require('../../../services/captcha.service');
+const actions = require('../../../data/actions.json');
 
-var handler = function(req, res, next) {
-  var payload = req.body;
-  console.log('New Capture:');
-  console.log(payload);
+const handler = (req, res) => {
+    const payload = req.body;
+    console.log('New Capture:');
+    console.log(payload);
+    console.log('From:', req.header('Referer'));
+    const action = actions[req.params.id];
 
-  var action = actions[req.params.id];
+    const remoteip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+    Captcha.verify(payload['g-recaptcha-response'], remoteip, (err, isValid) => {
+        console.log('isValid', isValid); // eslint-disable-line no-console
+    });
 
-  switch (action.type) {
-    case 'contact':
-      Email.newContact(action, payload, function(err, msg) {});
-      Slack.newContact(action, payload, function(err, msg) {});
-      break;
-    case 'download':
-      Email.newContact(action, payload, function(err, msg) {});
-      Slack.downloadCapture(action, payload, function(err, msg) {});
+    delete payload['g-recaptcha-response'];
 
-      if (payload.segment) {
-        Segment.identify({
-          anonymousId: payload.segment.anonId,
-          userId: payload.email,
-          traits: payload.segment.traits
-        });
+    switch (action.type) {
+        case 'contact':
+            Email.newContact(action, payload, () => {
+            });
+            Slack.newContact(action, payload, () => {
+            });
+            break;
+        case 'download':
+            Email.newContact(action, payload, () => {
+            });
+            Slack.downloadCapture(action, payload, () => {
+            });
 
-        Segment.track({
-          anonymousId: payload.segment.anonId,
-          userId: payload.email,
-          event: payload.segment.event,
-          properties: payload.segment.properties
-        });
-      }
-      break;
-  }
+            if (payload.segment) {
+                Segment.identify({
+                    anonymousId: payload.segment.anonId,
+                    userId: payload.email,
+                    traits: payload.segment.traits
+                });
 
-  res.status(200).send({
-    message: 'Success!'
-  });
-}
+                Segment.track({
+                    anonymousId: payload.segment.anonId,
+                    userId: payload.email,
+                    event: payload.segment.event,
+                    properties: payload.segment.properties
+                });
+            }
+            break;
+        default:
+            break;
+    }
+
+    res.status(200).send({
+        message: 'Success!'
+    });
+};
 
 module.exports = handler;

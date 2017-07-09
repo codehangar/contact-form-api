@@ -1,15 +1,13 @@
-describe('EmailService Tests', function() {
+describe('EmailService Tests', () => {
+    let emailService;
+    let postmark;
 
-    var emailService;
-
-    beforeEach(function() {
-
+    beforeEach(() => {
         mockery.enable({
             warnOnReplace: false,
             warnOnUnregistered: false,
             useCleanCache: true
         });
-
 
         // Mock the postmark service
         postmark = sinon.stub();
@@ -18,15 +16,13 @@ describe('EmailService Tests', function() {
         // replace the require() module `postmark` with a stub object
         mockery.registerMock('postmark', postmark);
 
-        emailService = require('../../../../src/services/email/email-service');
+        emailService = require('../../../src/services/email.service');
     });
 
-    describe('newContact', function() {
-
-        it('should be a function', function(done) {
+    describe('newContact', () => {
+        it('should be a function', done => {
             expect(emailService.newContact).to.be.a('function');
             done();
         });
-
     });
 });
