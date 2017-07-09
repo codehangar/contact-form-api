@@ -1,4 +1,7 @@
 # contact-form-api
+
+[![Build Status](https://travis-ci.org/codehangar/contact-form-api.svg?branch=master)](https://travis-ci.org/codehangar/contact-form-api)
+
 A simple API to receive and handle contact form posts
 
 To test locally, be sure to include a file names `.env` in the root of the project with the following settings:
