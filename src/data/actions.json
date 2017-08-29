@@ -9,6 +9,10 @@
             "bcc": null,
             "templateId": "216061"
         },
+        "postmarkResponder": {
+            "from": "info@codehangar.io",
+            "cc": "info@codehangar.io"
+        },
         "slack": {
             "username": "Code Hangar Contact",
             "channel": "#contact-form",

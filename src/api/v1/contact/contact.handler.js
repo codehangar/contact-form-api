@@ -12,11 +12,13 @@ const handler = (req, res) => {
     const action = actions[req.params.id];
 
     const remoteip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-    Captcha.verify(payload['g-recaptcha-response'], remoteip, (err, isValid) => {
-        console.log('isValid', isValid); // eslint-disable-line no-console
-    });
 
-    delete payload['g-recaptcha-response'];
+    if (payload['g-recaptcha-response']) {
+        Captcha.verify(payload['g-recaptcha-response'], remoteip, (err, isValid) => {
+            console.log('isValid', isValid); // eslint-disable-line no-console
+        });
+        delete payload['g-recaptcha-response'];
+    }
 
     switch (action.type) {
         case 'contact':
@@ -24,6 +26,10 @@ const handler = (req, res) => {
             });
             Slack.newContact(action, payload, () => {
             });
+            if (req.query.autoRespondTemplate) {
+                payload.templateId = req.query.autoRespondTemplate;
+                Email.autoRespond(action, payload, () => null);
+            }
             break;
         case 'download':
             Email.newContact(action, payload, () => {
