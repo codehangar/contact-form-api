@@ -88,8 +88,8 @@ describe('ContactHandler Tests', () => {
         });
 
         it('should call Email.autoRespond() with if template id is given', () => {
-            const req1 = Object.assign(req, {query: {autoRespondTemplate: '1234'}});
-            contactHandler(req, res);
+            const req1 = Object.assign({}, req, {query: {autoRespondTemplate: '1234'}});
+            contactHandler(req1, res);
             expect(Email.autoRespond.calledWith(contactFormAction, 'test')).to.equal(true);
         });
     });
