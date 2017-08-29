@@ -1,5 +1,5 @@
 const actions = require('../../../../../src/data/actions.json');
-const slackAction = actions['codehangar-contact-form'];
+const contactFormAction = actions['codehangar-contact-form'];
 
 describe('ContactHandler Tests', () => {
     let contactHandler;
@@ -25,6 +25,7 @@ describe('ContactHandler Tests', () => {
         // Mock the Email service
         Email = sinon.stub();
         Email.newContact = sinon.stub();
+        Email.autoRespond = sinon.stub();
 
         // replace the require() module `Email` with a stub object
         mockery.registerMock('../../../services/email.service', Email);
@@ -36,7 +37,8 @@ describe('ContactHandler Tests', () => {
             params: {
                 id: 'codehangar-contact-form'
             },
-            connection: {remoteAddress: ''}
+            connection: {remoteAddress: ''},
+            query: {}
         };
         res = {
             status: () => ({
@@ -62,7 +64,7 @@ describe('ContactHandler Tests', () => {
 
         it('should call Slack.newContact() with req.body', () => {
             contactHandler(req, res);
-            expect(Slack.newContact.calledWith(slackAction, 'test')).to.equal(true);
+            expect(Slack.newContact.calledWith(contactFormAction, 'test')).to.equal(true);
         });
 
         it('should call res.status() one time', () => {
@@ -73,6 +75,22 @@ describe('ContactHandler Tests', () => {
         it('should call res.status() with 200', () => {
             contactHandler(req, res);
             expect(res.status.calledWith(200)).to.equal(true);
+        });
+
+        it('should call Email.newContact() with req.body', () => {
+            contactHandler(req, res);
+            expect(Email.newContact.calledWith(contactFormAction, 'test')).to.equal(true);
+        });
+
+        it('should NOT call Email.autoRespond() with no template id given', () => {
+            contactHandler(req, res);
+            expect(Email.autoRespond.calledWith(contactFormAction, 'test')).to.not.equal(true);
+        });
+
+        it('should call Email.autoRespond() with if template id is given', () => {
+            const req1 = Object.assign(req, {query: {autoRespondTemplate: '1234'}});
+            contactHandler(req, res);
+            expect(Email.autoRespond.calledWith(contactFormAction, 'test')).to.equal(true);
         });
     });
 
