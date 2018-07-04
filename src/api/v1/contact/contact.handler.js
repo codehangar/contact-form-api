@@ -15,50 +15,59 @@ const handler = (req, res) => {
 
     if (payload['g-recaptcha-response']) {
         Captcha.verify(payload['g-recaptcha-response'], remoteip, (err, isValid) => {
-            console.log('isValid', isValid); // eslint-disable-line no-console
+            console.log('Captcha isValid: ', isValid); // eslint-disable-line no-console
+
+            if (isValid) {
+                delete payload['g-recaptcha-response'];
+
+                switch (action.type) {
+                    case 'contact':
+                        Email.newContact(action, payload, () => {
+                        });
+                        Slack.newContact(action, payload, () => {
+                        });
+                        if (req.query.autoRespondTemplate) {
+                            payload.templateId = req.query.autoRespondTemplate;
+                            Email.autoRespond(action, payload, () => null);
+                        }
+                        break;
+                    case 'download':
+                        Email.newContact(action, payload, () => {
+                        });
+                        Slack.downloadCapture(action, payload, () => {
+                        });
+
+                        if (payload.segment) {
+                            Segment.identify({
+                                anonymousId: payload.segment.anonId,
+                                userId: payload.email,
+                                traits: payload.segment.traits
+                            });
+
+                            Segment.track({
+                                anonymousId: payload.segment.anonId,
+                                userId: payload.email,
+                                event: payload.segment.event,
+                                properties: payload.segment.properties
+                            });
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                return res.status(200).send({
+                    message: 'Success!'
+                });
+            }
+
+            return res.status(404).send();
         });
-        delete payload['g-recaptcha-response'];
+    } else {
+        return res.status(404).send();
     }
 
-    switch (action.type) {
-        case 'contact':
-            Email.newContact(action, payload, () => {
-            });
-            Slack.newContact(action, payload, () => {
-            });
-            if (req.query.autoRespondTemplate) {
-                payload.templateId = req.query.autoRespondTemplate;
-                Email.autoRespond(action, payload, () => null);
-            }
-            break;
-        case 'download':
-            Email.newContact(action, payload, () => {
-            });
-            Slack.downloadCapture(action, payload, () => {
-            });
-
-            if (payload.segment) {
-                Segment.identify({
-                    anonymousId: payload.segment.anonId,
-                    userId: payload.email,
-                    traits: payload.segment.traits
-                });
-
-                Segment.track({
-                    anonymousId: payload.segment.anonId,
-                    userId: payload.email,
-                    event: payload.segment.event,
-                    properties: payload.segment.properties
-                });
-            }
-            break;
-        default:
-            break;
-    }
-
-    res.status(200).send({
-        message: 'Success!'
-    });
+    return null;
 };
 
 module.exports = handler;
